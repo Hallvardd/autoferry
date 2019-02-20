@@ -1,14 +1,17 @@
 import detectorAPI as odapi
 import time
 import cv2
+import os
 
 
 if __name__ == "__main__":
+    # sets detect either to true or false for debugging.
+    detect = True
     start_time = time.clock()
     run_time = time.clock()
     fps = 10
-    model_path = '/home/hallvard/gcvenv/autoferry/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
-    video_path = '/home/hallvard/Videos/TownCentreXVID.avi'
+    model_path = str(os.sys.path[0]) + '/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
+    video_path = str(os.sys.path[0]) + '/TownCentreXVID.avi'
     odapi = odapi.DetectorAPI(path_to_ckpt=model_path)
     threshold = 0.7
 
@@ -19,7 +22,7 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
 
     # Use ip-cam
-    #cap = cv2.VideoCapture('rtsp://admin:autogruppe4@192.168.0.100//Streaming/Channels/101')
+    # cap = cv2.VideoCapture('rtsp://admin:autogruppe4@192.168.0.100//Streaming/Channels/101')
 
     cap.set(cv2.CAP_PROP_FPS, fps)
     cap.set(cv2.CAP_PROP_BUFFERSIZE,1)
@@ -29,7 +32,7 @@ if __name__ == "__main__":
 
         # Visualization of the results of a detection.
         number_of_humans = 0
-        if run_time-start_time > 10.0:
+        if run_time-start_time > 10.0 and detect:
             boxes, scores, classes, num = odapi.processFrame(img)
             for i in range(len(boxes)):
                 # Class 1 represents human,
@@ -55,14 +58,3 @@ if __name__ == "__main__":
         key = cv2.waitKey(1)
         if key & 0xFF == ord('q'):
             break
-
-    # TODO find the middle of the rectangle.
-        # find a way of knowing how the box moves
-            # use a kalman filter, with a model of human movement.
-            # Dissapearing boxes.
-            # Dynamic way of finding the history of the boxes.
-            # Person class.
-                # ID pos
-    # find when a rectangle crosses the line.
-    # implement a buffer zone where the counting happens
-    # method for.
