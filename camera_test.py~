@@ -1,0 +1,17 @@
+import cv2
+# Note the following is the typical rtsp url for streaming from an ip cam
+# source = "rtsp://user:password@ipaddress:port/<camera specific stuff>"
+# Each manufacturer is different. For my alibi cameras, this would be
+# a valid url to use with the info you provided.
+source = "rtsp://admin:12345@20.0.0.14//Streaming/Channels/2"
+cap = cv2.VideoCapture(source)
+
+ok_flag = True
+while ok_flag:
+    (ok_flag, img) = cap.read()
+    if not ok_flag: break
+    cv2.imshow("some window", img)
+    if cv2.waitKey(10) == 27:
+        break
+
+cv2.destroyAllWindows()
