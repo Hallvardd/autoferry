@@ -1,6 +1,6 @@
 # autoferry
 
-Link too medium:
+Link to medium:
 
 Requirements:
 
