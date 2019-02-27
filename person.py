@@ -6,7 +6,8 @@ class Person:
     def __init__(self, initial_pos:(int,int), idNr:int):
         self.idNr = idNr
         self.counted = False
-        self.positions = []
+        self.position_history = []
+        self.closest_points = []
         self.add_position(initial_pos)
         # Directions are set as a value between 0 and 2pi.
         # Initialized as -1.0 for unknown.
@@ -22,12 +23,12 @@ class Person:
         self.counted = counted
 
     def add_position(self, position:float):
-        self.positions.append(position)
+        self.position_history.append(position)
 
-    def get_positions(self) -> [(int,int)]:
-        return self.positions
+    def get_position_history(self) -> [(int,int)]:
+        return self.position_history
 
-    def get_last_position(self):
+    def get_last_position(self) -> (int,int) :
         return self.positions[-1]
 
     def generate_dir_rads(self, vector) -> float:
@@ -43,19 +44,25 @@ class Person:
         return direction
 
     def update_direction(self):
-
         if(len(self.positions) > 2):
             # the last 3 recorded points.
-            p1 = self.positions[-3]
-            p2 = self.positions[-2]
-            p3 = self.positions[-1]
+            p1 = self.position_history[-3]
+            p2 = self.position_history[-2]
+            p3 = self.position_history[-1]
             # vectors
             v1 = (p2[0] - p1[0], p2[1] - p1[1])
             v2 = (p3[0] - p2[0], p3[1] - p2[1])
-            # added vector
+            # Added vector
             v3 = np.array([v1[0] + v2[0], v1[0] + v2[1]])
-
             self.direction = self.generate_dir_rads(v3)
+
+        elif(len(self.positions) == 2):
+            p1 = self.position_history[-2]
+            p2 = self.position_history[-1]
+            # vectors
+            v1 = (p2[0] - p1[0], p2[1] - p1[1])
+            self.direction = self.generate_dir_rads(v1)
+
 
     def get_direction(self) -> float:
         return self.direction
