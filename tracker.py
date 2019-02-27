@@ -9,7 +9,7 @@ class Tracker:
         self.threshold = threshold
 
     def add_person(self, position):
-        self.persons[idCounter] = {Person(self.idCounter,position)}
+        self.persons[self.idCounter] = {Person(self.idCounter,position)}
         self.idCounter += 1
 
 
@@ -27,3 +27,10 @@ class Tracker:
 
     def update_persondict(self, postition : [(int,int)]):
         return 0
+
+
+coords = [(0,3),(3,4),(4,8)]
+
+tracker = Tracker()
+
+tracker.fill_persondict(coords)

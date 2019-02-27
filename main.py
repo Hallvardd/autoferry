@@ -28,30 +28,26 @@ if __name__ == "__main__":
     cap.set(cv2.CAP_PROP_BUFFERSIZE,1)
     while True:
         r, img = cap.read()
-        #img = cv2.resize(img, (1280, 720))
 
         # Visualization of the results of a detection.
         number_of_humans = 0
         if run_time-start_time > 10.0 and detect:
-            boxes, scores, classes, num = odapi.processFrame(img)  #Bytt ut boxes med points
-            for i in range(len(boxes)):  #Bytt ut boxes med points
+            points, scores, classes, num = odapi.processFrame(img)
+            for i in range(len(points)):
                 # Class 1 represents human,
                 # Class 2 represents bicycle,
                 # Class 18 represents dog,
                 # Class 33 represents suitcase
                 if (classes[i] == 1) and (scores[i] > threshold):
                     box = boxes[i]  #point = points[i]
-                    number_of_humans += 1 
-                    cv2.rectangle(img,(box[1],box[0]),(box[3],box[2]),(255,0,0),2)
-                   #cv2.circle(img,(point[0],point[1]),10,(255,0,0),2) 
+                    number_of_humans += 1
+                    cv2.circle(img,(point[0],point[1]),10,(255,0,0),2)
                 elif (classes[i] == 2) and (scores[i] > threshold):
-                    box = boxes[i]  #point = points[i]
-                    cv2.rectangle(img,(box[1],box[0]),(box[3],box[2]),(0,255,0),2)
-                   #cv2.circle(img,(point[0],point[1]),10,(0,255,0),2)
+                    point = points[i]
+                    cv2.circle(img,(point[0],point[1]),10,(0,255,0),2)
                 elif classes[i] == 18 and scores[i] > threshold:
-                    box = boxes[i]  #point = points[i]
-                    cv2.rectangle(img,(box[1],box[0]),(box[3],box[2]),(0,0,255),2)
-                   #cv2.circle(img,(point[0],point[1]),10,(0,0,255),2)
+                    point = points[i]
+                    cv2.circle(img,(point[0],point[1]),10,(0,0,255),2)
 
         else:
             run_time = run_time = time.clock()
