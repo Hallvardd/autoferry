@@ -27,10 +27,3 @@ class Tracker:
 
     def update_persondict(self, postition : [(int,int)]):
         return 0
-
-
-coords = [(0,3),(3,4),(4,8)]
-
-tracker = Tracker()
-
-tracker.fill_persondict(coords)
