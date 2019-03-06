@@ -57,15 +57,33 @@ def countPersons(listOfTrackedPersons, previousCount, crossingLine):
 
 	for person in listOfTrackedPersons:
 		if (person.counted == False and distanceToLineFromCoordinate(crossingLine, person.get_last_position()) < threshold):
-			person.set_counted(True)
-			newCount += 1
+			if ( checkIfPersonHasCrossedLine(person, croossingLine) == True ):
+				person.set_counted(True)
+				newCount += 1
 
 	return newCount, listOfTrackedPersons
 
 
 
+def checkIfPersonHasCrossedLine(person, line):
+	#has crossed if last position was behind line and current point is in front of line
+	#assume that persons walk from left to right in the image.
+	#ASSUME LINE IS STRAIGHT DOWN IN THE IMAGE, THUS startX = endX
 
+	coordinateHistory = person.get_position_history()
+	isIn
+	if (len(coordinateHistory) >= 2):
+		if (isPointBehindLine(coordinateHistory[-1], line) == False and isPointBehindLine(coordinateHistory[-2], line) == True):
+			return True
 
+def isPointBehindLine(coordinate, line):
+	#coordinate: (x,y)
+	#assume the line is STRAIGH DOWN, THUS startX = endX (startX, startY, endX, endY)
+	assert startX == endX
+	if (coordinate[0] < line[startX] ):
+		return True
+	elif (coordinate[0] > line[startX] and coordinate[1] >= startY and coordinate[1] <= endY):
+		return True
 
 def testCount():
 	print("testing count")
@@ -78,6 +96,8 @@ def testCount():
 	prevCount = 0
 
 	n, l = countPersons(personList, prevCount, crosslingLine)
+	print(n)
+	print(l)
 
 
 testCount()
