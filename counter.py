@@ -28,7 +28,6 @@ def distanceToLineFromCoordinate(line, coordinate):
 	linePoint1 = np.array([int(line[0]), int(line[1])])
 	linePoint2 = np.array([int(line[2]), int(line[3])])	
 
-
 	distance = abs(np.cross(linePoint2-linePoint1,coordinate-linePoint1)/np.linalg.norm(linePoint2-linePoint1))
 	return distance  #row vector of the position for coordinate
 
@@ -61,7 +60,10 @@ def countPersons(listOfTrackedPersons, previousCount, crossingLine):
 			person.set_counted(True)
 			newCount += 1
 
-	return newCount, personList
+	return newCount, listOfTrackedPersons
+
+
+
 
 
 
@@ -75,10 +77,7 @@ def testCount():
 	crosslingLine = defineCrossingLine()
 	prevCount = 0
 
-	countPersons(personList, prevCount, crosslingLine)
-
-	print( distanceToLineFromCoordinate(crosslingLine, person1.get_last_position()) )
-
+	n, l = countPersons(personList, prevCount, crosslingLine)
 
 
 testCount()
