@@ -30,7 +30,7 @@ class Tracker:
     def tracking_algorithm(self, dictionary):
         personsUpdated = []                                # List of human(IDs) that have updated their history
         for position in dictionary:                        # Loop through all new points detected.
-            dictionary[point].sort(key=lambda x:x[1])      # For each point, sort the person-coordiante tuples by distance to point. Shortest distancefirst
+            dictionary[position].sort(key=lambda x:x[1])      # For each point, sort the person-coordiante tuples by distance to point. Shortest distancefirst
             for element in dictionary[position]:           # Loop over all person-coordinate tuples
                 (ID,dist) = element                     
                 if ID not in personsUpdated:
@@ -38,15 +38,13 @@ class Tracker:
                     personsUpdated.append(ID)
                     break
 
-    def calculateDistanceFromPersonsToPoints(self, personList, coordinateList):
+    def calculateDistanceFromPersonsToPoints(self, personList, positions):
         distanceDict = {}
-        for i in range(len(coordinateList)):
+        for i in range(len(positions)):
             d = []
-            print(personList)
-            for person in personList: # ERROR: iterates over both keys and persons.
-                distance = math.sqrt( (coordinateList[i][0] - person.get_last_position()[0])**2 + (coordinateList[i][1] - person.get_last_position()[1])**2 )
-                d.append((person.get_idNr(),distance))
-            distanceDict[coordinateList[i]] = d
-        print(distanceDict)
+            for Id,person in personList.items(): # ERROR: iterates over both keys and persons.
+                distance = math.sqrt( (positions[i][0] - person.get_last_position()[0])**2 + (positions[i][1] - person.get_last_position()[1])**2 )
+                d.append((Id,distance))
+            distanceDict[positions[i]] = d
         return distanceDict #returned value is an np array where each element contains an np array of distances for a person. element 0 in distances contains distance from person 0 to all coordinates in coordiateList 
-        
+            

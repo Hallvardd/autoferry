@@ -29,7 +29,7 @@ class Person:
         return self.position_history
 
     def get_last_position(self) -> (int,int) :
-        return self.positions[-1]
+        return self.position_history[-1]
 
     def generate_dir_rads(self, vector) -> float:
         direction = -1.0
@@ -44,7 +44,7 @@ class Person:
         return direction
 
     def update_direction(self):
-        if(len(self.positions) > 2):
+        if(len(self.position_history) > 2):
             # the last 3 recorded points.
             p1 = self.position_history[-3]
             p2 = self.position_history[-2]
@@ -56,7 +56,7 @@ class Person:
             v3 = np.array([v1[0] + v2[0], v1[0] + v2[1]])
             self.direction = self.generate_dir_rads(v3)
 
-        elif(len(self.positions) == 2):
+        elif(len(self.position_history) == 2):
             p1 = self.position_history[-2]
             p2 = self.position_history[-1]
             # vectors

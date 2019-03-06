@@ -38,7 +38,7 @@ class DetectorAPI:
         # Expand dimensions since the trained_model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image, axis=0)
         # Actual detection.
-        print(self.detection_boxes)
+        #print(self.detection_boxes)
         start_time = time.time()
         (boxes, scores, classes, num) = self.sess.run(
             [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
@@ -48,7 +48,7 @@ class DetectorAPI:
         print("Elapsed Time:", end_time-start_time)
 
         im_height, im_width,_ = image.shape
-        boxes_list = [None for i in range(boxes.shape[1])]
+        #boxes_list = [None for i in range(boxes.shape[1])]
         point_list= [None for i in range(boxes.shape[1])]
         for i in range(boxes.shape[1]):
             point_list[i] = (int(((boxes[0,i,1]*im_width)+(boxes[0,i,3]*im_width))/2), int(((boxes[0,i,0] * im_height)+(boxes[0,i,2] * im_height))/2))
@@ -56,13 +56,13 @@ class DetectorAPI:
             #            int(boxes[0,i,1] * im_width),
             #            int(boxes[0,i,2] * im_height),
             #            int(boxes[0,i,3] * im_width))
-        return boxes_list, point_list, scores[0].tolist(), [int(x) for x in classes[0].tolist()], int(num[0])
+        return point_list, scores[0].tolist(), [int(x) for x in classes[0].tolist()], int(num[0])
 
     def close(self):
         self.sess.close()
         self.default_graph.close()
 
-    def addBoxesToFrame(self, boxes, centroids, scores, classes, num, img):
+    def addBoxesToFrame(self, centroids, scores, classes, num, img):
         threshold = 0.7
         #for i in range(len(boxes)):
         #    if (classes[i] == 1) and (scores[i] > threshold):

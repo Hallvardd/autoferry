@@ -1,59 +1,47 @@
-import detectorAPI as odapi
-import time
+import threading as th
 import cv2
-import os
+import numpy as np
+import detectorAPI
+import tracker
+import person
+from getFrame import GetFrame
+from showFrame import ShowFrame
+from processFrame import ProcessFrame
+ 
+#video_path = '/home/henning/Desktop/EiT/human_detector/TownCentreXVID.avi'
+#model_path = '/home/henning/Desktop/EiT/human_detector/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
+#ip_camera_path = 'rtsp://admin:autogruppe4@192.168.0.100//Streaming/Channels/102'
+
+video_path = r'''C:\Users\Henning\Desktop\EiT\TownCentreXVID.avi'''
+model_path = r'''C:\Users\Henning\Desktop\EiT\faster_rcnn_inception_v2_coco_2018_01_28\frozen_inference_graph.pb'''
+ip_camera_path = 'rtsp://admin:autogruppe4@192.168.0.100//Streaming/Channels/102'
+web_cam = 0
 
 
-if __name__ == "__main__":
-    # sets detect either to true or false for debugging.
-    detect = True
-    start_time = time.clock()
-    run_time = time.clock()
-    fps = 10
-    model_path = str(os.sys.path[0]) + '/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
-    video_path = str(os.sys.path[0]) + '/TownCentreXVID.avi'
-    odapi = odapi.DetectorAPI(path_to_ckpt=model_path)
-    threshold = 0.7
 
-    # Use video:
-    # cap = cv2.VideoCapture(video_path)
+if __name__ ==  "__main__":
+    cap = cv2.VideoCapture(ip_camera_path)
+    detector = detectorAPI.DetectorAPI(path_to_ckpt=model_path)
+    r, frameInit  = cap.read()
+    cap.release()
+    centroidsInit, scoresInit, classesInit, numInit = detector.processFrame(frameInit)
+    
+    frame_grabber = GetFrame(video_path).start()
+    frame_shower = ShowFrame(frame=frameInit).start()
+    frame_processor = ProcessFrame(frame=frameInit,detector=detector,centroids=centroidsInit,classes=classesInit,scores=scoresInit,num=numInit).start()
+    tracker = tracker.Tracker()
 
-    # Use webcam
-    cap = cv2.VideoCapture(0)
-
-    # Use ip-cam
-    # cap = cv2.VideoCapture('rtsp://admin:autogruppe4@192.168.0.100//Streaming/Channels/101')
-
-    cap.set(cv2.CAP_PROP_FPS, fps)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE,1)
     while True:
-        r, img = cap.read()
-
-        # Visualization of the results of a detection.
-        number_of_humans = 0
-        if run_time-start_time > 10.0 and detect:
-            points, scores, classes, num = odapi.processFrame(img)
-            for i in range(len(points)):
-                # Class 1 represents human,
-                # Class 2 represents bicycle,
-                # Class 18 represents dog,
-                # Class 33 represents suitcase
-                if (classes[i] == 1) and (scores[i] > threshold):
-                    box = boxes[i]  #point = points[i]
-                    number_of_humans += 1
-                    cv2.circle(img,(point[0],point[1]),10,(255,0,0),2)
-                elif (classes[i] == 2) and (scores[i] > threshold):
-                    point = points[i]
-                    cv2.circle(img,(point[0],point[1]),10,(0,255,0),2)
-                elif classes[i] == 18 and scores[i] > threshold:
-                    point = points[i]
-                    cv2.circle(img,(point[0],point[1]),10,(0,0,255),2)
-
+        frame = frame_grabber.frame # Grab a frame
+        frame_processor.unprocessedFrame = frame # Process the frame
+        frameWithBoxes = detector.addBoxesToFrame(frame_processor.centroids, frame_processor.scores, frame_processor.classes, frame_processor.num, frame)
+        
+        print(tracker.personDict)
+        if not tracker.personDict:
+            tracker.fill_persondict(frame_processor.positions)
         else:
-            run_time = run_time = time.clock()
+            distances = tracker.calculateDistanceFromPersonsToPoints(tracker.personDict, frame_processor.positions)
+            tracker.tracking_algorithm(distances)
 
+        frame_shower.frame = frameWithBoxes # Dispaly the frame
 
-        cv2.imshow("preview", img)
-        key = cv2.waitKey(1)
-        if key & 0xFF == ord('q'):
-            break
