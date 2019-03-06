@@ -71,7 +71,7 @@ class DetectorAPI:
         for i in range(len(centroids)):
             if (classes[i] == 1) and (scores[i] > threshold):
                 cv2.circle(img, centroids[i], radius=2, color=(255,0,0), thickness=6, lineType=8, shift=0)
-        return img 
+        return img
 
     def listOfPersons(self, centroids, scores, classes):
         threshold = 0.7
@@ -79,12 +79,12 @@ class DetectorAPI:
         for i in range(len(centroids)):
             if (classes[i] == 1) and (scores[i] > threshold):
                 personList.append(centroids[i])
-        return personList 
+        return personList
 
 if __name__ == "__main__":
     #model_path = '/path/to/faster_rcnn_inception_v2_coco_2017_11_08/frozen_inference_graph.pb'
-    model_path = r'''C:\Users\Henning\Desktop\EiT\faster_rcnn_inception_v2_coco_2018_01_28\frozen_inference_graph.pb'''
-    video_path = r'''C:\Users\Henning\Desktop\EiT\TownCentreXVID.avi'''
+    model_path = model_path = str(os.sys.path[0]) + '/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
+    video_path = video_path = str(os.sys.path[0]) + '/TownCentreXVID.avi'
     odapi = DetectorAPI(path_to_ckpt=model_path)
     threshold = 0.7
     #cap = cv2.VideoCapture(0)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         #img = cv2.resize(img, (1280, 720))
         img = cv2.resize(img, (128, 128))
         boxes, scores, classes, num = odapi.processFrame(img)
-        # Visualization of the results of a detection. 
+        # Visualization of the results of a detection.
         number_of_humans = 0
         for i in range(len(boxes)):
             # Class 1 represents human, Class 2 represents bicycle, Class 18 represents dog, Class 33 represents suitcase
@@ -111,7 +111,7 @@ if __name__ == "__main__":
             elif classes[i] == 18 and scores[i] > threshold:
                 box = boxes[i]
                 cv2.rectangle(img,(box[1],box[0]),(box[3],box[2]),(0,0,255),2)
-    
+
         cv2.imshow("preview", img)
         key = cv2.waitKey(1)
         if key & 0xFF == ord('q'):
