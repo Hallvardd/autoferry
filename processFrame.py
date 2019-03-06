@@ -21,6 +21,7 @@ class ProcessFrame():
         while not self.stopped:
             self.centroids, self.scores, self.classes, self.num = self.detector.processFrame(self.unprocessedFrame) #Process frame and generate boxes and scores.
             self.positions = self.detector.listOfPersons(self.centroids, self.scores, self.classes)
+            print(self.positions)
 
     def stop(self):
         self.stopped = True
