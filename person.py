@@ -12,6 +12,10 @@ class Person:
         # Directions are set as a value between 0 and 2pi.
         # Initialized as -1.0 for unknown.
         self.direction = -1.0
+        # The treshold should be set by a model for human movement. Currently set to 50 pixels.
+        self.threshold = 50
+        # max threshold is also subject to change
+        self.max_threshold = 75
 
     def get_idNr(self) -> int:
         return self.idNr
@@ -62,6 +66,26 @@ class Person:
             # vectors
             v1 = (p2[0] - p1[0], p2[1] - p1[1])
             self.direction = self.generate_dir_rads(v1)
+
+        def update_threshold(self):
+        if(len(self.position_history) > 2):
+            # the last 3 recorded points.
+            p1 = self.position_history[-3]
+            p2 = self.position_history[-2]
+            p3 = self.position_history[-1]
+            # vectors
+            v1 = (p2[0] - p1[0], p2[1] - p1[1])
+            v2 = (p3[0] - p2[0], p3[1] - p2[1])
+            # Added vector
+            v3 = np.array([v1[0] + v2[0], v1[0] + v2[1]])
+            self.threshold = (math.sqrt(v3[0]**2 + v3[1]**2))/2
+
+        elif(len(self.position_history) == 2):
+            p1 = self.position_history[-2]
+            p2 = self.position_history[-1]
+            # vectors
+            v1 = (p2[0] - p1[0], p2[1] - p1[1])
+            self.threshold = (math.sqrt(v1[0]**2 + v1[1]**2))
 
 
     def get_direction(self) -> float:
