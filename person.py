@@ -3,7 +3,7 @@ import math
 import os
 
 class Person:
-    def __init__(self, initial_pos:(int,int), idNr:int):
+    def __init__(self, idNr:int, initial_pos:(int,int)):
         self.idNr = idNr
         self.counted = False
         self.position_history = []
