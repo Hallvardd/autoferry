@@ -46,9 +46,9 @@ if __name__ ==  "__main__":
 
 
     font                   = cv2.FONT_HERSHEY_SIMPLEX
-    bottomLeftCornerOfText = (10,500)
+    bottomLeftCornerOfText = (50,50)
     fontScale              = 1
-    fontColor              = (255,255,255)
+    fontColor              = (0,0,0)
     lineType               = 2
 
 
@@ -79,9 +79,11 @@ if __name__ ==  "__main__":
                 person.set_counted(True)
                 currentPersonCount += isCounted
         
-        print("NUM COUNTED: ", currentPersonCount)
-    
-        #cv2.putText(frame, currentPersonCount, bottomLeftCornerOfText, font, fontScale,    fontColor,    lineType)
+        #print("NUM COUNTED: ", currentPersonCount)
+        string = "Counted persons: " + str(currentPersonCount)
+        cv2.putText(frameWithCentroids, string, bottomLeftCornerOfText, font, fontScale,    fontColor,    lineType)
+        #cv2.putText(frameWithCentroids, str(currentPersonCount),(100,100), font, 1, (200,0,0), 3, cv2.LINE_AA)
+        #cv2.putText(frameWithCentroids, currentPersonCount, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), lineType=cv2.LINE_AA)
         cv2.imshow("Video", frameWithCentroids)
         print("\n\n")
         if cv2.waitKey(1) == ord("q"):
