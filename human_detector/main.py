@@ -9,6 +9,7 @@ import time
 from getFrame import GetFrame
 from showFrame import ShowFrame
 from processFrame import ProcessFrame
+import counter
  
 video_path = sys.path[0] + '/TownCentreXVID.avi'
 model_path = sys.path[0] + '/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
@@ -34,15 +35,28 @@ if __name__ ==  "__main__":
     #frame_processor = ProcessFrame(frame=frameInit,detector=detector,centroids=centroidsInit,classes=classesInit,scores=scoresInit,num=numInit).start()
     tracker = tracker.Tracker()
     
-    time.sleep(0.1)
+    time.sleep(0.01)
 
     tracker.fill_persondict(positionsInit)
     
     source = cv2.VideoCapture(video_path)
-    
+    previousCount = 0
+    currentPersonCount = 0
+    crossingLine = counter.defineCrossingLine()
+
+
+    font                   = cv2.FONT_HERSHEY_SIMPLEX
+    bottomLeftCornerOfText = (10,500)
+    fontScale              = 1
+    fontColor              = (255,255,255)
+    lineType               = 2
+
+
     while True:
         #frame = frame_grabber.frame # Grab a frame
+
         (flag, frame) = source.read()
+        counter.drawCrossingLine(crossingLine, frame)
         #frame_processor.unprocessedFrame = frame # Process the frame
         #frameWithCentroids = detector.addCentroidsToFrame(frame_processor.centroids, frame_processor.scores, frame_processor.classes, frame_processor.num, frame)
         #print(frame_processor.positions)
@@ -56,12 +70,20 @@ if __name__ ==  "__main__":
         #frame_shower.frame = imageWithPath # Dispaly the frame
         
         for ID,person in tracker.personDict.items():
-            print("History length for person ",ID," :", person.position_history)
+            #print("History length for person ",ID," :", person.position_history)
+            print("person ", ID, ": is counted? ", person.get_counted())
             frameWithCentroids = tracker.personDict[ID].draw_path(frameWithCentroids)
             cv2.circle(frameWithCentroids, person.position_history[-1], radius=int(person.threshold), color=(255,0,0), thickness=3, lineType=8, shift=0)
-            
+            isCounted = counter.countPerson(person, crossingLine)
+            if (isCounted == True):
+                person.set_counted(True)
+                currentPersonCount += isCounted
+        
+        print("NUM COUNTED: ", currentPersonCount)
     
+        #cv2.putText(frame, currentPersonCount, bottomLeftCornerOfText, font, fontScale,    fontColor,    lineType)
         cv2.imshow("Video", frameWithCentroids)
+        print("\n\n")
         if cv2.waitKey(1) == ord("q"):
             break
         #frame_shower.frame = frameWithCentroids # Dispaly the frame
