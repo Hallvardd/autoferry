@@ -4,13 +4,14 @@ import math
 import os
 import cv2
 import kalmanFilter
+import nonLinReg
+import statistics as stat
 
 class Person:
     def __init__(self, idNr:int, initial_pos:(int,int)):
         self.idNr = idNr
         self.counted = False
         self.position_history = []
-        self.closest_points = []
         self.add_position(initial_pos)
         # Directions are set as a value between 0 and 2pi.
         # Initialized as -1.0 for unknown.
@@ -18,9 +19,17 @@ class Person:
         self.minThreshold = 15
         self.maxThreshold = 70
         self.skipped = 0
-        self.maxSkipped = 10
+        self.maxSkipped = 3 
         self.threshold = self.minThreshold
-        self.estimator = kalmanFilter.KalmanFilter(x0=np.array([[initial_pos[0]],[initial_pos[1]],[initial_pos[0]],[initial_pos[1]],[5],[5]]), p0 = np.eye(6, dtype='float'), Q=0.01*np.eye(6), R=0.01*np.eye(2))
+        self.estimator = kalmanFilter.KalmanFilter(x0=np.array([[initial_pos[0]],
+                                                                [initial_pos[1]],
+                                                                [initial_pos[0]],
+                                                                [initial_pos[1]],
+                                                                [self.minThreshold],
+                                                                [self.minThreshold]]),
+                                                   p0 = 0.1*np.eye(6, dtype='float'), 
+                                                   Q = 0.01*np.eye(6), 
+                                                   R = math.sqrt(5)*np.eye(2))
 
     def get_idNr(self) -> int:
         return self.idNr
@@ -52,7 +61,7 @@ class Person:
             direction = np.arctan(vector)[1]
         return direction
 
-    def update_direction(self):
+    def update_direction2(self):
         if(len(self.position_history) > 2):
             # the last 3 recorded points.
             p1 = self.position_history[-3]
@@ -72,6 +81,23 @@ class Person:
             v1 = (p2[0] - p1[0], p2[1] - p1[1])
             self.direction = self.generate_dir_rads(v1)
 
+    def update_direction(self):
+        directions = []
+        if len(self.position_history) >= 5:    
+            for i in range(int(len(self.position_history)/5)):
+                batch = self.position_history[i*5:(i+1)*5]
+                p1 = batch[0]
+                p2 = batch[-1]
+                v = (p2[0] - p1[0], p2[1] - p1[1])
+                directions.append(self.generate_dir_rads(v))
+        else:
+            p1 = self.position_history[0]
+            p2 = self.position_history[-1]
+            v = (p2[0] - p1[0], p2[1] - p1[1])
+            directions.append(self.generate_dir_rads(v))
+        
+        self.direction = stat.mean(directions)
+        
 
     def get_direction(self) -> float:
         return self.direction
@@ -90,4 +116,8 @@ class Person:
     def update_threshold(self):
         self.threshold = (self.skipped/self.maxSkipped)*self.maxThreshold + self.minThreshold
 
-
+    def update_max_skipped(self):
+        if len(self.position_history) > 5:
+            self.skippedMax = 7
+        else:
+            self.skippedMax = 2 # Assume detection where wrong if two detectios appear in four frames

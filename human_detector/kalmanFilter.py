@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 class KalmanFilter:
     def __init__(self, x0, p0, Q, R):
         self.N = 5
+        self.h = 2
+        self.tau = 10
         self.A = np.array([[1,0,0,0,1,0],
                            [0,1,0,0,0,1],
                            [1,0,0,0,0,0],
@@ -25,20 +27,17 @@ class KalmanFilter:
 
     def update_kalman_gain(self):
         self.K = self.p_bar @ self.H.T @ np.linalg.inv(self.H @ self.p_bar @ self.H.T + self.R)
-        #print("K shape: ", self.K.shape)
 
     def state_estimate_update(self, y):
         if None in y: 
             self.x_hat = self.x_bar
         elif y.shape == (2,1):
             self.x_hat = self.x_bar + self.K @ (y - self.H @ self.x_bar)
-            #print("Update :", self.K @ (y - self.H @ self.x_bar))
-            #print("X_hat shape: ", self.x_hat.shape)
         else:
             print("Measurement error")
 
     def covariance_update(self):
-        self.p_hat = (np.eye(6) - self.K @ self.H) @  self.p_bar @ (np.eye(6) - self.K @ self.H).T + self.K @ self.R @ self.K.T
+        self.p_hat = (np.eye(self.A.shape[0]) - self.K @ self.H) @  self.p_bar @ (np.eye(self.A.shape[0]) - self.K @ self.H).T + self.K @ self.R @ self.K.T
 
     def state_estimation_propagation(self):
         self.x_bar = self.A @ self.x_hat
@@ -66,10 +65,10 @@ class KalmanFilter:
 
 
 if __name__ == "__main__":
-    x0 = np.array([[10],[10],[0],[0],[20],[20]])
-    p0 = np.eye(6, dtype='float')
-    Q = 0.01*np.eye(6)
-    R = 0.01*np.eye(2)
+    x0 = np.array([[0],[0],[0],[0],[10],[10],[0],[0]])
+    p0 = np.eye(8, dtype='float')
+    Q = 0.01*np.eye(8)
+    R = 2.3*np.eye(2)
     kf = KalmanFilter(x0, p0, Q, R)
     
     test_img = np.zeros([100,100])

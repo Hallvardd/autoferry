@@ -39,7 +39,7 @@ class DetectorAPI:
         #print("Elapsed Time:", end_time-start_time)
 
         im_height, im_width,_ = image.shape
-        point_list= [None for i in range(boxes.shape[1])]
+        point_list = [None for i in range(boxes.shape[1])]
         for i in range(boxes.shape[1]):
             point_list[i] = (int(((boxes[0,i,1]*im_width)+(boxes[0,i,3]*im_width))/2), int(((boxes[0,i,0] * im_height)+(boxes[0,i,2] * im_height))/2))
         return point_list, scores[0].tolist(), [int(x) for x in classes[0].tolist()], int(num[0])
